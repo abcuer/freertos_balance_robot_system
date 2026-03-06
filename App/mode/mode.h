@@ -2,12 +2,6 @@
 #define _mode_h
 #include "stdint.h"
 
-void Balance(void);
-void ModeSelect(void);
-void CheckLiftState(void);
-void DetectPutDown(void);
-void CheckFallDown(void);
-void ObstacleAvoid(void);
 typedef struct{
 	uint8_t flag;
 	uint16_t time;
@@ -20,6 +14,13 @@ typedef struct {
     uint16_t putdown_counter;  // 放下计数器
     uint16_t lifted_counter;   // 提起计数器
 } BalanceState_t;
+
+void Balance(void);
+void ModeSelect(void);
+void CheckLiftState(void);
+void DetectPutDown(void);
+void CheckFallDown(void);
+void ObstacleAvoid(void);
 
 extern BalanceState_t balance_state;
 extern uint8_t obstacle_blocked;

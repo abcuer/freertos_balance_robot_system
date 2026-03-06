@@ -74,6 +74,10 @@ void Error_Handler(void);
 #define Right_IN1_GPIO_Port GPIOB
 #define Right_IN2_Pin GPIO_PIN_1
 #define Right_IN2_GPIO_Port GPIOB
+#define MPU_SCL_Pin GPIO_PIN_10
+#define MPU_SCL_GPIO_Port GPIOB
+#define MPU_SDA_Pin GPIO_PIN_11
+#define MPU_SDA_GPIO_Port GPIOB
 #define OLED_SCL_Pin GPIO_PIN_12
 #define OLED_SCL_GPIO_Port GPIOB
 #define OLED_SDA_Pin GPIO_PIN_13

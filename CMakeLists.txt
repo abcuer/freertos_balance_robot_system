@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 # 设置项目名称
-set(CMAKE_PROJECT_NAME RTOS_Balance_Car)
+set(CMAKE_PROJECT_NAME freertos_balance_car)
 
 # 设置 C 标准
 set(CMAKE_C_STANDARD 11)
@@ -26,8 +26,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # 彩色诊断
 set(CMAKE_COLOR_DIAGNOSTICS ON)
+
 # 包含工具链文件（必须在 project() 前设置编译器）
+# include("cmake/gcc-arm-none-eabi.cmake")
 include("cmake/gcc-arm-none-eabi.cmake")
+
 # 核心项目设置
 project(${CMAKE_PROJECT_NAME})
 message("Build type: " ${CMAKE_BUILD_TYPE})
@@ -68,10 +71,8 @@ endfunction()
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/control)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/mode)
-USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/pid)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/utils)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/task)
-USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/task/ctrl)
 
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Bsp)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Bsp/gpio)
@@ -86,9 +87,11 @@ USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/encoder)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/motor)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/oled)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/mpu6050)
-USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/mpu6050/filter)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/hc06)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/hcsr04)
+USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/algorithm)
+USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/algorithm/filter)
+USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/algorithm/pid)
 
 # ---------------- 链接选项（newlib-nano + printf浮点支持） -----------------
 target_link_options(${CMAKE_PROJECT_NAME} PUBLIC

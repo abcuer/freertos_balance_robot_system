@@ -1,8 +1,6 @@
-#include "beep.h"
 #include "headfile.h"
-#include "led.h"
 
-static SoundLight_t sound_light = {
+static SoundLight_t soundlight = {
 	.flag = 0, // 声光提示激活标志：1 表示正在进行声光报警，如避障蜂鸣器提醒；0 表示无报警
 	.time = 0  // 声光提示计时器：记录声光报警的持续时间，到达设定值后自动关闭蜂鸣器等提示
 };
@@ -24,7 +22,7 @@ void System_Init(void)
     HCSR04_Init();
     HC06_Init();
     PID_Init(&dist, POSITION_PID, dist_pid.kp, dist_pid.ki, dist_pid.kd);
-    delay_ms(10);
+    delay_ms(100);
 }
 
 /**
@@ -32,13 +30,13 @@ void System_Init(void)
  * @param 无
  * @retval 无
  */
-void SoundLight(void)
+void SoundLightRun(void)
 {
-	if(sound_light.flag == 0)
+	if(soundlight.flag == 0)
 	{
         SetLedMode(LED_FOLLOW, LED_ON);
 		SetBeepMode(BEEP_SYSTEM, BEEP_ON);
-		sound_light.flag = 1;
+		soundlight.flag = 1;
 	}
 }
 
@@ -47,18 +45,18 @@ void SoundLight(void)
  * @param 无
  * @retval 无
  */
-void UpdateSoundLight(void)
+void SoundLightUpdate(void)
 {
-    if(sound_light.flag)
+    if(soundlight.flag)
     {
-        sound_light.time++;
+        soundlight.time++;
 
-		if(sound_light.time >= 20) 
+		if(soundlight.time >= 20) 
 		{
             SetLedMode(LED_FOLLOW, LED_OFF);
 	    	SetBeepMode(BEEP_SYSTEM, BEEP_OFF);
-			sound_light.time = 0;
-			sound_light.flag = 0; 
+			soundlight.time = 0;
+			soundlight.flag = 0; 
 		}
         
     }

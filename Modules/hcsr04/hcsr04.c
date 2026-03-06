@@ -1,9 +1,6 @@
-#include "hc_sr04.h"
+#include "hcsr04.h"
 #include "tim.h"
 #include "bsp_delay.h"
-
-#define FILTER_SIZE 5
-#define MAX_TIME 30000 
 
 volatile uint16_t Time = 0;          // 超声波计时
 float distance_buffer[FILTER_SIZE];

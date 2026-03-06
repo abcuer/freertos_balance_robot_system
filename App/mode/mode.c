@@ -1,5 +1,5 @@
 #include "headfile.h"
-#include <stdlib.h>
+#include "math.h"
 
 BalanceState_t balance_state = {
 	.mode = 0,                  // 当前工作模式: 0 平衡模式，1 蓝牙遥控，2 超声波跟随

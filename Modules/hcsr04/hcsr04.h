@@ -1,8 +1,10 @@
-#ifndef __HC_SR04_H
-#define __HC_SR04_H
+#ifndef __HCSR04_H
+#define __HCSR04_H
 #include "stdint.h"
 
-// 初始化
+#define FILTER_SIZE 5
+#define MAX_TIME 30000 
+
 void HCSR04_Init(void);
 void HCSR04_GetValue(void);
 

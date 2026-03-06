@@ -57,7 +57,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, Left_IN1_Pin|Left_IN2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, Right_IN1_Pin|Right_IN2_Pin|GPIO_PIN_10|GPIO_PIN_11
+  HAL_GPIO_WritePin(GPIOB, Right_IN1_Pin|Right_IN2_Pin|MPU_SCL_Pin|MPU_SDA_Pin
                           |OLED_SCL_Pin|OLED_SDA_Pin|Follow_Pin|BlueTooth_Pin
                           |Balance_Pin, GPIO_PIN_RESET);
 
@@ -94,10 +94,10 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Right_IN1_Pin Right_IN2_Pin PB10 PB11
+  /*Configure GPIO pins : Right_IN1_Pin Right_IN2_Pin MPU_SCL_Pin MPU_SDA_Pin
                            OLED_SCL_Pin OLED_SDA_Pin Follow_Pin BlueTooth_Pin
                            Balance_Pin */
-  GPIO_InitStruct.Pin = Right_IN1_Pin|Right_IN2_Pin|GPIO_PIN_10|GPIO_PIN_11
+  GPIO_InitStruct.Pin = Right_IN1_Pin|Right_IN2_Pin|MPU_SCL_Pin|MPU_SDA_Pin
                           |OLED_SCL_Pin|OLED_SDA_Pin|Follow_Pin|BlueTooth_Pin
                           |Balance_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;

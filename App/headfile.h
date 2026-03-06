@@ -21,7 +21,7 @@
 #include "mpu6050.h"
 #include "motor.h"
 #include "encoder.h"
-#include "hc_sr04.h"
+#include "hcsr04.h"
 #include "hc06.h"
 /***************** App ****************/
 #include "mode.h"

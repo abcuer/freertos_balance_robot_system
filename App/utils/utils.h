@@ -3,8 +3,8 @@
 #include "pid.h"
 
 void System_Init(void);
-void SoundLight(void);
-void UpdateSoundLight(void);
+void SoundLightRun(void);
+void SoundLightUpdate(void);
 
 
 

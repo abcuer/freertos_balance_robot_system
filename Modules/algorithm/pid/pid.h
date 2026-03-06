@@ -17,7 +17,7 @@ typedef struct
 	float pout, dout, iout;
 	float out;   
 	
-	uint32_t pid_mode;
+	uint32_t mode;
 
 }PID_t;
 
