@@ -65,7 +65,6 @@ void Error_Handler(void);
 #define TRIG_GPIO_Port GPIOC
 #define MPU_INT_Pin GPIO_PIN_0
 #define MPU_INT_GPIO_Port GPIOA
-#define MPU_INT_EXTI_IRQn EXTI0_IRQn
 #define Left_IN1_Pin GPIO_PIN_4
 #define Left_IN1_GPIO_Port GPIOA
 #define Left_IN2_Pin GPIO_PIN_5

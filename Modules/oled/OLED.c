@@ -1,13 +1,14 @@
 #include "oled.h"
+#include "main.h"
 #include "oled_font.h"
 #include "bsp_delay.h"
 
 // 定义OLED的I2C总线结构体
-iic_bus_t oled_bus = {
-    .IIC_SDA_PORT = GPIOB,
-    .IIC_SDA_PIN = GPIO_PIN_13,
-    .IIC_SCL_PORT = GPIOB,
-    .IIC_SCL_PIN = GPIO_PIN_12
+static iic_bus_t oled_bus = {
+    .IIC_SDA_PORT = OLED_SDA_GPIO_Port,
+    .IIC_SDA_PIN = OLED_SDA_Pin,
+    .IIC_SCL_PORT = OLED_SCL_GPIO_Port,
+    .IIC_SCL_PIN = OLED_SCL_Pin
 };
 
 /**

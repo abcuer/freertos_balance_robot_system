@@ -4,6 +4,6 @@
 #include "motor.h"
 
 void Encoder_Init(void);
-void UpdateEncoder(void);
+void EncoderUpdate(void);
 
 #endif

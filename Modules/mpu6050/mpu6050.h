@@ -56,7 +56,7 @@ typedef struct
 }MPU_t;
 
 void MPU_Init(void);
-void MPU_Get_Angle(MPU_t *mpu);
+void MPU_Get_Angle(MPU_t *mpu, float dt);
 
 extern MPU_t mpu;
 

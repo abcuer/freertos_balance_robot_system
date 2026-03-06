@@ -98,8 +98,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   System_Init();
-  OLED_ShowString(1, 3, "HAL Update");
-	OLED_ShowString(2, 3, "Balance_Car");
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -116,16 +115,6 @@ int main(void)
 
   while (1)
   {
-  //   if(mpu_data_flag)
-  //   {
-  //     MPU_Get_Angle(&mpu);
-  //   	Balance();													  // 主控制逻辑
-  //   	CheckLiftState();  										// 提起检测
-  //   	CheckFallDown();											// 倒地检测
-  //   	DetectPutDown(); 											// 着陆检测
-  //     ModeSelect();                         // 模式切换   
-  //   	mpu_data_flag = 0;
-  //   }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

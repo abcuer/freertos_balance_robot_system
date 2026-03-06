@@ -2,8 +2,8 @@
 #define _hc06_h
 #include "stdint.h"
 
-#define MAX_Speed 18
-#define MAX_Turn 30
+#define MAX_Speed 16
+#define MAX_Turn 26
 
 typedef struct
 {
@@ -19,7 +19,7 @@ typedef struct
     uint8_t flag;
 } RX_DATA_t;
 
-void HC06_Init(void);
-void BlueTooth(void);
+void BT_Init(void);
+void BT_Start(void);
 
 #endif

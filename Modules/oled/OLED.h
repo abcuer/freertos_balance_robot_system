@@ -25,7 +25,4 @@ void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Leng
 void OLED_ShowFloat(uint8_t Line, uint8_t Column, float Number,
                     uint8_t IntegerLength, uint8_t DecimalLength);
 
-// 外部总线声明
-extern iic_bus_t oled_bus;
-
 #endif

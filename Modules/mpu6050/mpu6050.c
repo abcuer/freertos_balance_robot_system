@@ -221,15 +221,15 @@ static uint8_t MPU_Get_Accelerometer(int16_t *ax, int16_t *ay, int16_t *az)
     return res;
 }
 
-void MPU_Get_Angle(MPU_t *mpu)
+void MPU_Get_Angle(MPU_t *mpu, float dt)
 {
     MPU_Get_Gyroscope(&mpu->gyro[0], &mpu->gyro[1], &mpu->gyro[2]);
     MPU_Get_Accelerometer(&mpu->acc[0], &mpu->acc[1], &mpu->acc[2]);
-    mpu->accyAngle=atan2(mpu->acc[0], mpu->acc[2])*180/PI; //加速度计算倾角	
+    mpu->accyAngle=atan2(mpu->acc[0], mpu->acc[2])*180.0f /PI; //加速度计算倾角	
     mpu->gyroBalance = mpu->gyro[1];
     mpu->gyroyReal=mpu->gyro[1]/16.4;                            //陀螺仪量程转换	
     mpu->gyrozReal=mpu->gyro[2]/16.4;                            //陀螺仪量程转换
     // float dt = MPU_GetTime();
-    Kalman_getAngle(&KalmanY,mpu->accyAngle,-mpu->gyroyReal, 0.01f); 
+    Kalman_getAngle(&KalmanY,mpu->accyAngle,-mpu->gyroyReal, dt); 
     mpu->pitch = KalmanY.angle;          //卡尔曼滤波算角度
 }

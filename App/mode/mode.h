@@ -15,14 +15,15 @@ typedef struct {
     uint16_t lifted_counter;   // 提起计数器
 } BalanceState_t;
 
-void Balance(void);
-void ModeSelect(void);
-void CheckLiftState(void);
-void DetectPutDown(void);
-void CheckFallDown(void);
-void ObstacleAvoid(void);
+void Mode_KeepBalance(void);
+void Mode_Select(void);
 
-extern BalanceState_t balance_state;
-extern uint8_t obstacle_blocked;
+void Detect_LiftState(void);
+void Detect_PutDown(void);
+void Detect_FallDown(void);
+void Detect_ObsDist(void);
+
+extern BalanceState_t balance;
+extern volatile uint8_t obs_blocked_flag;
 
 #endif

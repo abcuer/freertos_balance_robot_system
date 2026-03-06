@@ -16,10 +16,10 @@ typedef struct {
 float AnglePidCtrl(float tar, float current, short gy);
 float SpeedPidCtrl(float filter, float tar);
 float TurnPidCtrl(short gz);
-void DistPidCtrl(void);
+float DistPidCtrl(void);
 
 void PWMLimit(float PWMA, float PWMB);
-void DataClear(void);
+void SpeedParamReset(void);
 
 extern PIDParam_t upright_pid;
 extern PIDParam_t speed_pid;

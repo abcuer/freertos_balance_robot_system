@@ -1,7 +1,7 @@
 #include "pid.h"
 #include <math.h>
 
-void PID_Init(PID_t *pid, uint32_t mode, float p, float i, float d)
+void PIDParamInit(PID_t *pid, uint32_t mode, float p, float i, float d)
 {
 	pid->mode = mode;
 	pid->p = p;
@@ -9,7 +9,16 @@ void PID_Init(PID_t *pid, uint32_t mode, float p, float i, float d)
 	pid->d = d;
 }
 
-void PidCalucate(PID_t *pid)
+static void PID_OutLimit(PID_t *pid)
+{
+	if(pid->out>=19000)	
+		pid->out=19000;
+	if(pid->out<=-19000)	
+		pid->out=-19000;
+}
+
+
+void PID_Calculate(PID_t *pid)
 {
 	// 计算当前偏差
 	pid->error[0] = pid->target - pid->now;
@@ -38,13 +47,6 @@ void PidCalucate(PID_t *pid)
 	pid->error[2] = pid->error[1];
 	pid->error[1] = pid->error[0];
 
-	PidOutLimit(pid);
+	PID_OutLimit(pid);
 }
 
-void PidOutLimit(PID_t *pid)
-{
-	if(pid->out>=19000)	
-		pid->out=19000;
-	if(pid->out<=-19000)	
-		pid->out=-19000;
-}

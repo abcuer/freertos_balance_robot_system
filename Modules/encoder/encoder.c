@@ -25,7 +25,8 @@ static int16_t EncoderRightGet(void)
     __HAL_TIM_SET_COUNTER(&htim1, 0);
     return -temp;
 }
-void UpdateEncoder(void)
+
+void EncoderUpdate(void)
 {
     motor_left.encoder  = EncoderLeftGet();
     motor_right.encoder = EncoderRightGet();

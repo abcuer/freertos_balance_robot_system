@@ -22,15 +22,15 @@
 #include "motor.h"
 #include "encoder.h"
 #include "hcsr04.h"
-#include "hc06.h"
+#include "bt.h"
 /***************** App ****************/
 #include "mode.h"
 #include "pid.h"
 #include "control.h"
 #include "utils.h"
-
-/************************ 标志位 *********************/
-
-/************************ 全局变量 *********************/
+/************************ RTOS *********************/
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
 
 #endif

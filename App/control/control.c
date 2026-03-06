@@ -27,14 +27,14 @@ PIDParam_t speed_pid = {
 /* 7. 同时启用三环，调整参数直到满意为止(转向环不需要大调整) */
 PIDParam_t turn_pid = {
 	.kd = -0.28,	/* 左右移动 */
-	.kp = -25, 	/* 遥控模式下的转向速度 */
+	.kp = -20, 	/* 遥控模式下的转向速度 */
 	.out = 0,
 	.tar = 0
 };
 
 PIDParam_t dist_pid = {
-	.kp = -0.12,				
-	.ki = -0.12/200,			
+	.kp = -0.08,				
+	.ki = -0.08/200,			
 	.out = 0,
 	.tar = 150
 };
@@ -52,8 +52,7 @@ float AnglePidCtrl(float tar, float current, short gy)
 
 float SpeedPidCtrl(float filter, float tar)
 {
-	float pwm_out;
-	UpdateEncoder();
+	EncoderUpdate();
 	Encoder_Err = (motor_left.encoder + motor_right.encoder) - tar;
 	filtered_Err = (1-filter)*Encoder_Err + filter*last_filtered_Err;
 	last_filtered_Err = filtered_Err;
@@ -62,10 +61,10 @@ float SpeedPidCtrl(float filter, float tar)
     if (Encoder_S < -5000) Encoder_S = -5000;
 	if(stop_flag) 
 	{
-		Encoder_S = 0; // 小车偏转角度过大时清零积分量，防止小车重启时乱跑
+		SpeedParamReset(); // 小车偏转角度过大时清零积分量，防止小车重启时乱跑
 		stop_flag = 0;
 	}
-	pwm_out = speed_pid.kp*filtered_Err + speed_pid.ki*Encoder_S;
+	float pwm_out = speed_pid.kp*filtered_Err + speed_pid.ki*Encoder_S;
 	return pwm_out;
 }
 
@@ -74,24 +73,23 @@ float TurnPidCtrl(short gz)
 	return turn_pid.kp * turn_pid.tar - turn_pid.kd * gz;
 }
 
-void DistPidCtrl(void)
+float DistPidCtrl(void)
 {
 	dist.target = dist_pid.tar;
 	dist.now = distance;
-	PidCalucate(&dist);
-	speed_pid.tar = dist.out;
+	PID_Calculate(&dist);
+	return dist.out;
 }
 
-void DataClear(void)
+void SpeedParamReset(void)
 {
 	Encoder_Err = 0, filtered_Err = 0, last_filtered_Err = 0, Encoder_S = 0;
 }
 
-
 void PWMLimit(float PWMA, float PWMB)
 {
 	if(PWMA > MAXPWM) PWMA = MAXPWM;
-	if(PWMA < -MAXPWM) PWMA = -MAXPWM;
+	else if(PWMA < -MAXPWM) PWMA = -MAXPWM;
 	if(PWMB > MAXPWM) PWMB = MAXPWM;
-	if(PWMB < -MAXPWM) PWMB = -MAXPWM;
+	else if(PWMB < -MAXPWM) PWMB = -MAXPWM;
 }

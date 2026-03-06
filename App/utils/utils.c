@@ -20,9 +20,8 @@ void System_Init(void)
     Encoder_Init();
     OLED_Init();
     HCSR04_Init();
-    HC06_Init();
-    PID_Init(&dist, POSITION_PID, dist_pid.kp, dist_pid.ki, dist_pid.kd);
-    delay_ms(100);
+    PIDParamInit(&dist, POSITION_PID, dist_pid.kp, dist_pid.ki, dist_pid.kd);
+    delay_ms(20);
 }
 
 /**

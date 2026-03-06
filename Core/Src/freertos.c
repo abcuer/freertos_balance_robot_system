@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "task.h"
+#include "ctrl_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,11 +46,13 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 osThreadId ctrlTaskHandle;
+osThreadId detectTaskHandle;
+osThreadId oledTaskHandle;
 
-osSemaphoreId BinarySem_MPUHandle;
-osSemaphoreDef(BinarySem_MPU); 
+// 蓝牙接收信号量
+extern osSemaphoreId binSem_UART2Handle;
+
 /* USER CODE END Variables */
-osThreadId defaultTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -105,24 +107,20 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ...
-    osPriorityIdle          = -3,          ///< priority: idle (lowest)
-  osPriorityLow           = -2,          ///< priority: low
-  osPriorityBelowNormal   = -1,          ///< priority: below normal
-  osPriorityNormal        =  0,          ///< priority: normal (default)
-  osPriorityAboveNormal   = +1,          ///< priority: above normal
-  osPriorityHigh          = +2,          ///< priority: high
-  osPriorityRealtime      = +3,          ///< priority: realtime (highest)
-  */
-  BinarySem_MPUHandle = osSemaphoreCreate(osSemaphore(BinarySem_MPU), 1);
-  osSemaphoreWait(BinarySem_MPUHandle, 0);
+  osSemaphoreDef(binSem_UART2);
+  binSem_UART2Handle = osSemaphoreCreate(osSemaphore(binSem_UART2), 1);
 
-  osThreadDef(CtrlTask, CtrlTask, osPriorityRealtime, 0, 128);
+  osThreadDef(CtrlTask, StartCtrlTask, osPriorityRealtime, 0, 256);
   ctrlTaskHandle = osThreadCreate(osThread(CtrlTask), NULL);
+
+  osThreadDef(DetectTask, StartDetectTask, osPriorityHigh, 0, 256);
+  detectTaskHandle = osThreadCreate(osThread(DetectTask), NULL);
+
+  osThreadDef(OLEDTask, StartOLEDTask, osPriorityNormal, 0, 128);
+  oledTaskHandle = osThreadCreate(osThread(OLEDTask), NULL);
+
   /* USER CODE END RTOS_THREADS */
 
 }

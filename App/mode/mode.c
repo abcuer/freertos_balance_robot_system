@@ -1,7 +1,11 @@
 #include "headfile.h"
+#include "stdlib.h"
 #include "math.h"
 
-BalanceState_t balance_state = {
+static float pwm_out, PWMA, PWMB = 0;
+volatile uint8_t obs_blocked_flag = 0;  // 是否被障碍物拦住
+
+BalanceState_t balance = {
 	.mode = 0,                  // 当前工作模式: 0 平衡模式，1 蓝牙遥控，2 超声波跟随
     .lifted_flag = 0, 			// 提起标志位：1 表示小车被提起，0 表示正常运行
     .putdown_counter = 0,		// 放下计数器
@@ -9,76 +13,83 @@ BalanceState_t balance_state = {
     .balance_enable = 1,		// 平衡控制使能：1 开启，0 暂停
 };
 
-static float pwm_out, PWMA, PWMB = 0;
-uint8_t obstacle_blocked = 0;  // 是否被障碍物拦住
-
 /**
  * @brief 模式选择与切换函数，根据按键切换运行模式（平衡、蓝牙、跟随）
  * @param 无
  * @retval 无
  * @note 会根据当前模式调整PID参数和控制逻辑
  */
-void ModeSelect(void)
+void Mode_Select(void)
 {
 	static uint8_t last_mode = 0xFF;  
 	if(Key_GetNum(KEY_USER))
 	{
-		balance_state.mode++;
-		balance_state.mode %= 3;
+		balance.mode++;
+		balance.mode %= 3;
 		SetBeepMode(BEEP_SYSTEM, BEEP_ON);
 	} 
-	else if(balance_state.mode == 1)
+	else if(balance.mode == 1)
 	{
-		if(obstacle_blocked) SetBeepMode(BEEP_SYSTEM, BEEP_ON);
+		if(obs_blocked_flag) SetBeepMode(BEEP_SYSTEM, BEEP_ON);
 		else SetBeepMode(BEEP_SYSTEM, BEEP_OFF);
 	} 
 	else SetBeepMode(BEEP_SYSTEM, BEEP_OFF);
 	// 仅当模式发生变化时清除数据
-    if (balance_state.mode != last_mode)
+    if (balance.mode != last_mode)
     {
-        DataClear();
-        last_mode = balance_state.mode;  
+        SpeedParamReset();
+        last_mode = balance.mode;  
     }
-
-	if(balance_state.mode == 0)  //平衡模式										
+	if(balance.mode == 0)  //平衡模式
 	{
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0.6/200;
-   		SetLedMode(LED_BALANCE, LED_ON);        
+		SetLedMode(LED_BALANCE, LED_ON);        
 	}
 	else SetLedMode(LED_BALANCE, LED_OFF);  
-	if(balance_state.mode == 1)  // 遥控模式
+	if(balance.mode == 1)  // 遥控模式
 	{
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0;
+		// 开启蓝牙
+		BT_Start();
 		SetLedMode(LED_BLUETOOTH, LED_ON); 
-		BlueTooth();  // 正常蓝牙控制
-		ObstacleAvoid();
 	}
 	else SetLedMode(LED_BLUETOOTH, LED_OFF);
-	if(balance_state.mode == 2)	// 超声波跟随										
+	if(balance.mode == 2) // 超声波跟随
 	{
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0;
 		SetLedMode(LED_FOLLOW, LED_ON);  
-		HCSR04_GetValue();
 	}
 	else SetLedMode(LED_FOLLOW, LED_OFF);  
-}	
+}
 
 /**
  * @brief 平衡控制主函数，DMP读取姿态并计算三环PID，控制小车直立
  * @param 无
  * @retval 无
  */
-void Balance(void)
+void Mode_KeepBalance(void)
 {
-	if (balance_state.balance_enable) 					// 默认平衡模式
+	static uint16_t last_distance = 0;
+	if (balance.balance_enable) 					// 默认平衡模式
 	{
-		if(balance_state.mode == 2)
+		if(balance.mode == 2)
 		{
-			if(distance > 0 && distance <= 300)	DistPidCtrl(); 
-			else	speed_pid.tar = 0;  
+			// 只有当距离值发生变化时（说明超声波完成了一次物理测量）才更新 PID
+            if(distance != last_distance)
+            {
+				if(distance > 0 && distance <= 300)
+				{
+					speed_pid.tar = DistPidCtrl(); 
+				}	
+				else
+				{
+					speed_pid.tar = 0; 
+				}	
+				last_distance = distance;
+            } 
 		}
 		upright_pid.out = AnglePidCtrl(upright_pid.tar, mpu.pitch, mpu.gyroyReal);
 		speed_pid.out = SpeedPidCtrl(speed_pid.filter, speed_pid.tar);
@@ -98,17 +109,17 @@ void Balance(void)
  * @retval 无
  * @note 根据Pitch角度和陀螺仪Y轴速度判断，触发停止控制
  */
-void CheckLiftState(void)
+void Detect_LiftState(void)
 {
     // 拿起条件：角度大且角速度较大，持续一定时间
     if (fabs(mpu.pitch) > 40.0f && abs(mpu.gyroyReal) > 150 && motor_right.encoder > 50)
 	{
-		balance_state.lifted_counter++;
-		if (balance_state.lifted_counter > 30)
+		balance.lifted_counter++;
+		if (balance.lifted_counter > 30)
 		{
-			balance_state.lifted_flag = 1;
-			balance_state.balance_enable = 0;
-			balance_state.lifted_counter = 0;
+			balance.lifted_flag = 1;
+			balance.balance_enable = 0;
+			balance.lifted_counter = 0;
 			MotorStop();
 		}
 	}
@@ -120,23 +131,23 @@ void CheckLiftState(void)
  * @retval 无
  * @note 如果Pitch角度小于阈值且静止一段时间，恢复平衡控制
  */
-void DetectPutDown(void)
+void Detect_PutDown(void)
 {
-    if (balance_state.lifted_flag || stop_flag)
+    if (balance.lifted_flag || stop_flag)
     {
         if (fabs(mpu.pitch) < 20 && abs(mpu.gyroyReal) < 150 && abs(motor_right.encoder) < 120)
         {
-            if (balance_state.putdown_counter++ > 30)
+            if (balance.putdown_counter++ > 30)
             {
-				balance_state.lifted_flag = 0;
-				balance_state.putdown_counter = 0;
-				balance_state.balance_enable = 1; 
+				balance.lifted_flag = 0;
+				balance.putdown_counter = 0;
+				balance.balance_enable = 1; 
 				stop_flag = 0;           // 清除紧急停止标志
             }
         }
         else
         {
-            balance_state.putdown_counter = 0;
+            balance.putdown_counter = 0;
         }
     }
 }
@@ -148,11 +159,11 @@ void DetectPutDown(void)
  * @retval 无
  * @note 若倾斜角度超过设定阈值，则关闭平衡控制并停止电机
  */
-void CheckFallDown(void)
+void Detect_FallDown(void)
 {
 	if (fabs(upright_pid.tar - mpu.pitch) > 70 && stop_flag == 0)			// 倒地检测
 	{
-		balance_state.balance_enable = 0;
+		balance.balance_enable = 0;
 		MotorStop();
 	}   
 }
@@ -164,18 +175,22 @@ void CheckFallDown(void)
  * @note 距离过近则触发声光报警并禁止运动，距离恢复后解除限制
  */
 
-void ObstacleAvoid(void)
+void Detect_ObsDist(void)
 {
-	HCSR04_GetValue();
+	if(balance.mode == 1 || balance.mode == 2)
+	{
+		HCSR04_GetValue();
+	}
+
 	if(distance > 0 && distance <= 150.0f)
 	{
-		if(!obstacle_blocked && distance < 70.0f) 	
+		if(!obs_blocked_flag && distance < 70.0f) 	
 		{
-			obstacle_blocked = 1;
+			obs_blocked_flag = 1;
 		}		
-		else if (obstacle_blocked && distance > 100.0f)	
+		else if (obs_blocked_flag && distance > 100.0f)	
 		{
-			obstacle_blocked = 0; 
+			obs_blocked_flag = 0; 
 		}	
 	}
 }
