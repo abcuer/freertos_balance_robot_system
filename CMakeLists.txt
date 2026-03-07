@@ -73,7 +73,8 @@ USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/bluetooth)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/control)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/mode)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/utils)
-USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/tasks)
+USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/ui)
+USER_ADD_DIR(${CMAKE_SOURCE_DIR}/App/task)
 
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Bsp)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Bsp/gpio)
@@ -92,6 +93,7 @@ USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/hcsr04)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/algorithm)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/algorithm/filter)
 USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/algorithm/pid)
+USER_ADD_DIR(${CMAKE_SOURCE_DIR}/Modules/u8g2)
 
 # ---------------- 链接选项（newlib-nano + printf浮点支持） -----------------
 target_link_options(${CMAKE_PROJECT_NAME} PUBLIC

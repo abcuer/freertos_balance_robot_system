@@ -60,12 +60,37 @@ static void BT_ParseData(uint8_t data)
     }
 }
 
+/**
+ * @brief 蓝牙任务处理器
+ * @note 蓝牙状态检查、数据解析、更新目标速度
+ */
 void BT_Start(void)
 {
     if(osSemaphoreWait(binSem_UART2Handle, 0) == osOK)
     {
         BT_ParseData(rx_data.data);
-        BT_UpdateData(); 
+        BT_UpdateData(); // 更新目标速度
+    }
+}
+
+void Check_BT_Connect(void)
+{
+    // 如果当前处于蓝牙模式
+    if(balance.mode == MODE_BT_REMOTE)
+    {
+        // 检查当前时间与最后一次接收时间的差值
+        if(HAL_GetTick() - balance.last_rx_time < BT_TIMEOUT) 
+        {
+            balance.is_connected = 1; // BT_TIMEOUT之内有数据，视为连接正常
+        }
+        else 
+        {
+            balance.is_connected = 0; // 超过BT_TIMEOUT没数据，视为断开
+        }
+    }
+    else
+    {
+        balance.is_connected = 0; // 非蓝牙模式显示断开
     }
 }
 
@@ -73,7 +98,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart->Instance == USART2)
     {
-        // 增加非空判断
+        balance.last_rx_time = HAL_GetTick(); // 记录当前收到的时刻
         if(binSem_UART2Handle != NULL)
         {
             // 释放信号量，通知任务处理新数据

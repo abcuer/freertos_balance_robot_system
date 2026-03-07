@@ -1,3 +1,4 @@
+#include "mode.h"
 #include "headfile.h"
 #include "stdlib.h"
 #include "math.h"
@@ -11,6 +12,8 @@ BalanceState_t balance = {
     .putdown_counter = 0,		// 放下计数器
     .lifted_counter = 0,		// 提起计数器
     .balance_enable = 1,		// 平衡控制使能：1 开启，0 暂停
+	.is_connected = 0,         // 蓝牙连接状态：1已连，0断开
+	.last_rx_time = 0          // 上次接收到数据的时间戳
 };
 
 /**
@@ -28,7 +31,7 @@ void Mode_Select(void)
 		balance.mode %= 3;
 		SetBeepMode(BEEP_SYSTEM, BEEP_ON);
 	} 
-	else if(balance.mode == 1)
+	else if(balance.mode == MODE_BT_REMOTE)
 	{
 		if(obs_blocked_flag) SetBeepMode(BEEP_SYSTEM, BEEP_ON);
 		else SetBeepMode(BEEP_SYSTEM, BEEP_OFF);
@@ -40,23 +43,24 @@ void Mode_Select(void)
         SpeedParamReset();
         last_mode = balance.mode;  
     }
-	if(balance.mode == 0)  //平衡模式
+	if(balance.mode == MODE_BALANCE)  //平衡模式
 	{
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0.6/200;
 		SetLedMode(LED_BALANCE, LED_ON);        
 	}
 	else SetLedMode(LED_BALANCE, LED_OFF);  
-	if(balance.mode == 1)  // 遥控模式
+	if(balance.mode == MODE_BT_REMOTE)  // 遥控模式
 	{
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0;
-		// 开启蓝牙
+		// 开启蓝牙处理器
+		Check_BT_Connect();
 		BT_Start();
 		SetLedMode(LED_BLUETOOTH, LED_ON); 
 	}
 	else SetLedMode(LED_BLUETOOTH, LED_OFF);
-	if(balance.mode == 2) // 超声波跟随
+	if(balance.mode == MODE_FOLLOW) // 超声波跟随
 	{
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0;
@@ -169,7 +173,7 @@ void Detect_FallDown(void)
 }
  
 /**
- * @brief 蓝牙避障逻辑
+ * @brief 检测距离逻辑
  * @param 无
  * @retval 无
  * @note 距离过近则触发声光报警并禁止运动，距离恢复后解除限制

@@ -9,8 +9,8 @@
 #include "gpio.h"
 #include "tim.h"
 #include "usart.h"
-
 /***************** Bsp ****************/
+#include "bsp_gpio.h"
 #include "bsp_iic.h"
 #include "bsp_delay.h"
 /***************** Modules ****************/
@@ -25,9 +25,9 @@
 #include "bt.h"
 /***************** App ****************/
 #include "mode.h"
-#include "pid.h"
 #include "control.h"
 #include "utils.h"
+#include "ui.h"
 /************************ RTOS *********************/
 #include "FreeRTOS.h"
 #include "task.h"

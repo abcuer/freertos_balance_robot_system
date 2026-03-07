@@ -18,8 +18,9 @@ void System_Init(void)
     MPU_Init();
     Motor_Init();
     Encoder_Init();
-    OLED_Init();
     HCSR04_Init();
+
+    U8G2_Init(&u8g2);
     PIDParamInit(&dist, POSITION_PID, dist_pid.kp, dist_pid.ki, dist_pid.kd);
     delay_ms(20);
 }

@@ -2,8 +2,10 @@
 #define _hc06_h
 #include "stdint.h"
 
-#define MAX_Speed 16
-#define MAX_Turn 26
+#define BT_TIMEOUT 5000
+
+#define MAX_Speed 18
+#define MAX_Turn 30
 
 typedef struct
 {
@@ -21,5 +23,6 @@ typedef struct
 
 void BT_Init(void);
 void BT_Start(void);
+void Check_BT_Connect(void);
 
 #endif

@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ctrl_task.h"
+#include "user_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,10 +115,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(CtrlTask, StartCtrlTask, osPriorityRealtime, 0, 256);
   ctrlTaskHandle = osThreadCreate(osThread(CtrlTask), NULL);
 
-  osThreadDef(DetectTask, StartDetectTask, osPriorityHigh, 0, 256);
+  osThreadDef(DetectTask, StartDetectTask, osPriorityHigh, 0, 128);
   detectTaskHandle = osThreadCreate(osThread(DetectTask), NULL);
 
-  osThreadDef(OLEDTask, StartOLEDTask, osPriorityNormal, 0, 128);
+  osThreadDef(OLEDTask, StartOLEDTask, osPriorityNormal, 0, 512);
   oledTaskHandle = osThreadCreate(osThread(OLEDTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
