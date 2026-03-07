@@ -6,7 +6,7 @@
 #define MAX_TIME 30000 
 
 void HCSR04_Init(void);
-void HCSR04_GetValue(void);
+void HCSR04_GetDist(void);
 
 extern uint16_t distance;
 

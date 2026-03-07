@@ -2,6 +2,9 @@
 #define __PID_h_
 #include "stdint.h"
 
+
+#define MOTOR_PWM_MAX  2000  
+
 enum
 {
   POSITION_PID = 0,  // 位置式

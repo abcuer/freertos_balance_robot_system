@@ -65,7 +65,7 @@ static void OLED_DrawBluetoothPage(float distance, uint8_t is_connected)
     u8g2_DrawStr(&u8g2, 128 - dist_w, 10, str); 
     u8g2_DrawHLine(&u8g2, 0, 12, 128); 
 
-    // --- 3. 两边空白区域的“点子”修饰 ---
+    // --- 3. 两边空白区域的“点点”修饰 ---
     // 在左右两侧绘制一些对称的装饰点，模拟电子信号感
     for(int i=0; i<3; i++) {
         int offset = (HAL_GetTick() / 200 + i) % 4; // 简单的点阵动画
@@ -158,7 +158,7 @@ static void OLED_DrawFollowPage(float distance, float target_dist)
     u8g2_DrawDisc(&u8g2, cx, ball_y, 2, U8G2_DRAW_ALL); // 目标点
     u8g2_DrawFrame(&u8g2, cx - 5, ball_y - 5, 10, 10);  // 锁定框
 
-    // --- 4. 底部数据反馈区 (新增分割线) ---
+    // --- 4. 底部数据反馈区 ---
     u8g2_DrawHLine(&u8g2, 0, 53, 128); // *** 新增：底部分割线 ***
 
     u8g2_SetFont(&u8g2, u8g2_font_4x6_tf); // 使用极小字体

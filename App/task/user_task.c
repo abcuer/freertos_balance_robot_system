@@ -3,8 +3,8 @@
 #include "ui.h"
 
 #define CTRL_PERIOD 5
-#define DETECT_PERIOD 40
-#define Show_PERIOD 200
+#define DETECT_PERIOD 30
+#define Show_PERIOD 180
 
 void StartCtrlTask(void const * argument)
 {
@@ -21,12 +21,11 @@ void StartDetectTask(void const * argument)
     BT_Init();
     for(;;)
     {
-        Mode_Select();  
-        Detect_LiftState();  										// 提起检测
-        Detect_FallDown();										    // 倒地检测
-        Detect_PutDown(); 		                                    // 着陆检测
-        Detect_ObsDist();
-
+        Mode_Select();  	// 选择模式									
+        Detect_ObsDist();   // 获取超声波测距值
+        Detect_FallDown();  // 提起/倒地检测							    
+        Detect_PutDown();   // 着陆检测                           
+                       
         osDelay(DETECT_PERIOD);
     }
 }

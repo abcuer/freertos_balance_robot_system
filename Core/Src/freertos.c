@@ -48,9 +48,10 @@
 osThreadId ctrlTaskHandle;
 osThreadId detectTaskHandle;
 osThreadId oledTaskHandle;
-
 // 蓝牙接收信号量
-extern osSemaphoreId binSem_UART2Handle;
+osSemaphoreId binSem_UART2Handle;
+// 创建 echo 信号量
+osSemaphoreId echoSemHandle;
 
 /* USER CODE END Variables */
 
@@ -112,10 +113,13 @@ void MX_FREERTOS_Init(void) {
   osSemaphoreDef(binSem_UART2);
   binSem_UART2Handle = osSemaphoreCreate(osSemaphore(binSem_UART2), 1);
 
+  osSemaphoreDef(echoSem);
+  echoSemHandle = osSemaphoreCreate(osSemaphore(echoSem), 1);
+
   osThreadDef(CtrlTask, StartCtrlTask, osPriorityRealtime, 0, 256);
   ctrlTaskHandle = osThreadCreate(osThread(CtrlTask), NULL);
 
-  osThreadDef(DetectTask, StartDetectTask, osPriorityHigh, 0, 128);
+  osThreadDef(DetectTask, StartDetectTask, osPriorityHigh, 0, 256);
   detectTaskHandle = osThreadCreate(osThread(DetectTask), NULL);
 
   osThreadDef(OLEDTask, StartOLEDTask, osPriorityNormal, 0, 512);

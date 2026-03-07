@@ -4,8 +4,8 @@
 
 #define BT_TIMEOUT 5000
 
-#define MAX_Speed 18
-#define MAX_Turn 30
+#define MAX_Speed 16
+#define MAX_Turn 20
 
 typedef struct
 {

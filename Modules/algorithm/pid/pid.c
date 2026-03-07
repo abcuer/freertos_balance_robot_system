@@ -11,10 +11,14 @@ void PIDParamInit(PID_t *pid, uint32_t mode, float p, float i, float d)
 
 static void PID_OutLimit(PID_t *pid)
 {
-	if(pid->out>=19000)	
-		pid->out=19000;
-	if(pid->out<=-19000)	
-		pid->out=-19000;
+    if (pid->out > MOTOR_PWM_MAX)  
+    {
+        pid->out = MOTOR_PWM_MAX;
+    }
+    else if (pid->out < -MOTOR_PWM_MAX) 
+    {
+        pid->out = -MOTOR_PWM_MAX;
+    }
 }
 
 

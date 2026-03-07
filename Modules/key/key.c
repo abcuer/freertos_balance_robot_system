@@ -58,9 +58,9 @@ uint8_t Key_GetNum(KEY_Type_e KeyType)
     KEYInstance *instance = &key[KeyType];
     KEY_State_e currentState = GetKeyState(KeyType);
     uint8_t key_event = 0;
-    if (currentState == KEY_PRESSED && instance->RunningParam.LastState == KEY_RELEASED)
+    if (currentState == KEY_RELEASED && instance->RunningParam.LastState == KEY_PRESSED)
     {
-        if (GetKeyState(KeyType) == KEY_PRESSED)
+        if (GetKeyState(KeyType) == KEY_RELEASED)
         {
             key_event = 1;
         }

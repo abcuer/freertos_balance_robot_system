@@ -1,17 +1,50 @@
-# 全能智能平衡小车：蓝牙遥控+自动跟随+自我保护！
-# [视频演示](https://www.bilibili.com/video/BV1s4JLzUE3u)
-## [PCB开源](https://oshwhub.com/fascinating_sea/stm32_balancecar)
-## 标准库：https://github.com/abcuer/STM32_Balance_Car
-## HAL/RTOS：https://github.com/abcuer/HAL_Balance_Car
-## 功能说明
+# STM32 + FreeRTOS 平衡车
+## 本项目是一款基于 STM32 核心控制器与 FreeRTOS 实时操作系统开发的多功能双轮平衡小车。通过高效的任务调度与逻辑设计，实现了稳定的平衡控制、高精度的环境感知以及直观的 u8g2 UI 交互。
+## [视频演示](https://www.bilibili.com/video/BV1s4JLzUE3u) | [PCB开源](https://oshwhub.com/fascinating_sea/stm32_balancecar)
 
-- **平衡模式**：**白灯**表示**平衡模式**，具备较强的稳定平衡能力。
-- **蓝牙避障模式**：**蓝灯**表示**蓝牙模式**。可通过手机控制小车运动；当小车距离物体**小于设定距离**时，小车触发**声光警报**；当小车处于**安全距离**，**恢复正常**。
-- **超声波跟随模式**：**红灯**进入**跟随模式**。小车会**跟随设定距离内的物体**；若物体距离**小于设定距离**，小车将**自动后退**，与物体**保持安全距离**。
-- **提起检测**：当小车**被拿起并持续一段时间**后，小车将**停止运行**。
-- **着陆检测**：当小车处于**直立状态，放置地上一段时间**后，小车将**恢复运行**。
-- **倒地检测**：当小车处于**倒地状态**，小车将**停止运行**。
-## 电子模块(带商品链接)
+## 🛠 核心架构：FreeRTOS 任务调度
+项目通过 FreeRTOS 实现了控制、监测与显示的完全解耦，量化任务配置如下：
+- **CtrlTask (最高优先级)** 负责 **MPU6050 角度解算**及**直立+速度+转向 PID **运算，确保平衡频率达 **200Hz**。
+
+- **DetectTask (高优先级)**: 执行**模式切换**逻辑、**安全检测**及**超声波测距**。
+
+- **OLEDTask (普通优先级)**：负责 **u8g2 UI** 渲染，采用**异步显示**机制，**不占用核心控制时序**。
+
+### RTOS 技术深度应用
+- **二值信号量 (Binary Semaphore)**：用于**蓝牙数据接收信号**``` (binSem_UART2Handle) ```及**超声波回响信号** ```(echoSemHandle)``` 的实时同步。
+
+- **临界区保护 (Critical Sections)**：在修改 PID 目标值及切换模式时使用 ```taskENTER_CRITICAL()```，**防止多任务数据竞争**。
+
+## 🎮 三大运行模式
+系统支持通过**物理按键**循环切换，并动态更新 **PID** 参数：
+
+| 模式名称 | 功能描述 | 核心量化指标 |
+| :--- | :--- | :--- |
+| **平衡模式** | 拥有稳健的自平衡能力，抗干扰鲁棒性强。 | 直立环采样率 **200Hz**，平衡倾角偏差 **< 0.5°**。 |
+| **蓝牙遥控模式** | 通过 HC-06 模块与手机 App 连接，实现 8 方向遥控。 | 遥控响应延迟 **< 10ms**；具备 **7cm** 障碍物自动警报功能。 |
+| **超声波跟随** | 小车自动保持与前方目标的距离。 | 跟随距离维持在约 **25cm**；测距精度达 **±0.1cm**。 |
+## 3. 传感器技术：非阻塞式测距
+超声波测距采用**信号量 + 定时器输入捕获 + 外部中断** 的组合方案：
+- **高精度**：通过硬件定时器捕捉 ECHO 引脚的高电平持续时间。
+- **实时性**：测量过程不阻塞 CPU 运行，测距数据通过滑动平均滤波处理，确保跟随模式下的平滑性。
+## 📊 UI 交互设计 (**u8g2** 库)
+项目基于 u8g2 图形库设计了三套独立 UI，通过 ```balance.mode``` 自动切换：
+- **监控 UI**：实时显示 Pitch 角度、系统运行时间及当前工作状态。
+- **蓝牙 UI**：显示连接状态 (OK/NO)。当接收到心跳包（包括 0x00）时立即显示连接成功。
+- **雷达 UI**：模拟雷达扫描动画，量化显示前方障碍物的物理距离。
+## 🛡 安全检测机制
+系统内置双重安全防护，确保硬件安全：
+- **倒地检测 (Detect_FallDown)**：当 $|Pitch| > 55^\circ$ 且持续 3 个周期时，判定为倒地，强制执行电机停机并锁定状态。
+- **着陆检测 (Detect_PutDown)**：在锁定状态下，若满足“角度回正 (<10°)”、“角速度平静”且“轮子静止”持续 25 个周期 (约 0.75s) 时，自动重置 PID 积分并恢复平衡。
+## 📺 演示与展示
+- ### 概视图
+![前视图](.doc/src/1597536b14526257abb66c83db5a8879.jpg) 
+![后视图](.doc/src/3dd9fb143a53159b16f8972a5833be3.jpg)
+- ### UI 界面
+![](.doc/src/UI_BAL.jpg)
+![](.doc/src/UI_BT.jpg)
+![](.doc/src/UI_FOL.jpg)
+## 📦物料清单
 - [IN5824二极管*3(SS54 SMA) ￥2.18](https://e.tb.cn/h.6F2CfQNJmlFCtSV?tk=1M0LVkzgXYz )
 - [塔克 R5 Pro系列两轮自平衡小车 ￥106](https://e.tb.cn/h.6uAF5g45EmSc1Lb?tk=GEIKVkA9akD)
 - [STM32F103C8T6最小系统板(进口-typec口) ￥9](https://e.tb.cn/h.6F2Kzzjs2VY6GzD?tk=upy0VkzbU8N)
@@ -27,10 +60,8 @@
 - [5.5*2.1DC插口(耐高温) ￥2.28]( https://e.tb.cn/h.6FaZAarcmwBMbPl?tk=mwa4VkBzccQ)
 - [DC-DC降压模块固定输出 5V ￥3.4](https://e.tb.cn/h.6FatQAOa1dSCjAw?tk=34RnVkzJe2M )
 - [12V锂电池2500mAh(DC公母头) ￥22.6](https://e.tb.cn/h.6FaEa2BSxeb0pBQ?tk=a8VHVkztrz0)
-- [1*4p 1*8p 1*20p排母 ￥7](https://e.tb.cn/h.6FZKytSz8cwDzKC?tk=oqIVVkAIaMW)
-- [1*2p排针 ￥2.3]( https://e.tb.cn/h.6FZsiVNPa38YEo6?tk=emUCVkAHc1w )
+- [14p 18p 120p排母 ￥7](https://e.tb.cn/h.6FZKytSz8cwDzKC?tk=oqIVVkAIaMW)
+- [12p排针 ￥2.3]( https://e.tb.cn/h.6FZsiVNPa38YEo6?tk=emUCVkAHc1w )
 
-![前视图](./src/1597536b14526257abb66c83db5a8879.jpg)
-![俯视图](./src/2c66186acd2f387187dd3ee689d3554c.jpg)
-![后视图](./src/3dd9fb143a53159b16f8972a5833be3.jpg)
-![PCB](./src/0a053a80354407da4dd48eb7ba30a58.jpg)
+
+

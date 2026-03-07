@@ -10,6 +10,7 @@ typedef struct {
     float tar, current;
 	float filter;
 	float out;
+    float flollow_range;     // 跟随的范围
 } PIDParam_t;  
 
 
@@ -19,7 +20,7 @@ float TurnPidCtrl(short gz);
 float DistPidCtrl(void);
 
 void PWMLimit(float PWMA, float PWMB);
-void SpeedParamReset(void);
+void PIDParamReset(void);
 
 extern PIDParam_t upright_pid;
 extern PIDParam_t speed_pid;
