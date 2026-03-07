@@ -1,5 +1,5 @@
-# STM32 + FreeRTOS 平衡车
-## 本项目是一款基于 STM32 核心控制器与 FreeRTOS 实时操作系统开发的多功能双轮平衡小车。通过高效的任务调度与逻辑设计，实现了稳定的平衡控制、高精度的环境感知以及直观的 u8g2 UI 交互。
+# 全能平衡车PLUS: 遥控 | 跟随 | 安全保护 | UI设计
+ 本项目是一款基于 **STM32** 与 **FreeRTOS实时操作系统**开发的多功能双轮平衡车。通过高效的**任务调度/信号量通信与逻辑设计**，实现了稳定的**平衡控制**、高精度的**环境感知**以及直观的 **u8g2 UI** 交互。
 ## [视频演示](https://www.bilibili.com/video/BV1s4JLzUE3u) | [PCB开源](https://oshwhub.com/fascinating_sea/stm32_balancecar)
 
 ## 🛠 核心架构：FreeRTOS 任务调度
