@@ -21,17 +21,6 @@ void HCSR04_Init(void)
     for(int i=0; i<FILTER_SIZE; i++) distance_buffer[i] = 0;
 }
 
-/**
- * @brief 触发超声波测距
- */
-static void HCSR04_Start(void)
-{
-    HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_SET);
-    // RTOS 下极短的死等延时，10us 不会严重阻塞系统
-    delay_us(10);
-    HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
-}
-
 static float HCSR04_Filter(float new_val)
 {
     static float last_val = 0;
@@ -79,6 +68,17 @@ static float HCSR04_Filter(float new_val)
     return final_val;
 }
 
+/**
+ * @brief 触发超声波测距
+ */
+static void HCSR04_Start(void)
+{
+    HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_SET);
+    // RTOS 下极短的死等延时，10us 不会严重阻塞系统
+    delay_us(10);
+    HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
+}
+
 void HCSR04_GetDist(void)
 {
     // 1. 发射超声波触发脉冲
@@ -92,7 +92,7 @@ void HCSR04_GetDist(void)
         // pulse_width 单位是微秒 (us)。公式：距离(cm) = 时间(us) * 0.017
         float raw_distance = pulse_width * 0.017f;
         
-        // 4. 经过高级滤波获取最终距离
+        // 4. 经过滤波获取最终距离
         distance = (uint16_t)HCSR04_Filter(raw_distance);
     }
 }
@@ -116,13 +116,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
             // 记录结束时刻的定时器计数值
             uint16_t end_time = __HAL_TIM_GET_COUNTER(&htim2);
             
-            // 无符号 16 位整数减法，自动完美处理定时器溢出翻转 (65535 -> 0) 的问题
+            // 无符号 16 位整数减法，完美处理定时器溢出翻转 (65535 -> 0) 的问题
             pulse_width = (uint16_t)(end_time - start_time); 
             
             // 释放信号量，唤醒处于阻塞状态的 DetectTask
             if(echoSemHandle != NULL) {
-                // 注意：在中断中必须调用带 FromISR 结尾的 FreeRTOS API，
-                // 如果使用 CMSIS-OS V1 封装，osSemaphoreRelease 内部已处理 ISR 情况
+
                 osSemaphoreRelease(echoSemHandle);
             }
         }

@@ -67,7 +67,7 @@ uint8_t stop_flag = 0;
 void MotorStop(void)
 {
 	stop_flag = 1;  // 立即设置停止标志
-	PIDParamReset();
+	CarParamReset();
     
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);

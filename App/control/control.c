@@ -5,8 +5,8 @@
 /* 2. 只启用直立环kp、ki, 调整 ki 到小车高频低幅振荡 */
 /* 3. 将kp、ki都乘上 0.6 ,调整速度环 */
 PIDParam_t upright_pid = {
-    .kp = 360*0.6f,
-    .kd = -23*0.6f, 
+    .kp = 345*0.6f,
+    .kd = -22*0.6f, 
 	.out = 0,
     .tar = 0.65f
 };
@@ -27,7 +27,7 @@ PIDParam_t speed_pid = {
 /* 7. 同时启用三环，调整参数直到满意为止(转向环不需要大调整) */
 PIDParam_t turn_pid = {
 	.kd = -0.28f,	/* 左右移动 */
-	.kp = -18.0f, 	/* 遥控模式下的转向速度 */
+	.kp = -22.0f, 	/* 遥控模式下的转向速度 */
 	.out = 0,
 	.tar = 0
 };
@@ -62,7 +62,7 @@ float SpeedPidCtrl(float filter, float tar)
     if (Encoder_S < -5000) Encoder_S = -5000;
 	if(stop_flag) 
 	{
-		PIDParamReset(); // 小车偏转角度过大时清零积分量，防止小车重启时乱跑
+		CarParamReset(); // 小车偏转角度过大时清零积分量，防止小车重启时乱跑
 		stop_flag = 0;
 	}
 	float pwm_out = speed_pid.kp*filtered_Err + speed_pid.ki*Encoder_S;
@@ -82,9 +82,11 @@ float DistPidCtrl(void)
 	return dist.out;
 }
 
-void PIDParamReset(void)
+void CarParamReset(void)
 {
 	Encoder_Err = 0, filtered_Err = 0, last_filtered_Err = 0, Encoder_S = 0;
+	balance.is_connected = 0;
+	balance.last_rx_time = 0;
 	upright_pid.out = 0;
 	speed_pid.out = 0;
 	turn_pid.out = 0;

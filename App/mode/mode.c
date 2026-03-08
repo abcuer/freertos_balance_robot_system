@@ -40,7 +40,7 @@ void Mode_Select(void)
 	// 仅当模式发生变化时清除数据
     if (balance.mode != last_mode)
     {
-        PIDParamReset();
+        CarParamReset();
         last_mode = balance.mode;  
     }
 
@@ -56,7 +56,7 @@ void Mode_Select(void)
 		speed_pid.kp = 0.6;
 		speed_pid.ki = 0;
 		// 开启蓝牙处理器
-		Check_BT_Connect();
+		BT_Check_Connect();
 		BT_Start();
 		SetLedMode(LED_BLUETOOTH, LED_ON); 
 	}
@@ -113,7 +113,7 @@ void Detect_FallDown(void)
 	if (fabs(upright_pid.tar - mpu.pitch) > 55.0f && stop_flag == 0)			// 倒地检测
 	{
 		balance.falldown_counter++;
-		if (balance.falldown_counter >= 3)  // 连续3次
+		if (balance.falldown_counter >= 5) 
 		{
 			balance.balance_enable = 0;
 			balance.falldown_flag = 1;
@@ -131,16 +131,16 @@ void Detect_PutDown(void)
 {
     if (balance.falldown_counter || stop_flag)
     {
-        if (fabs(mpu.pitch) < 10 && abs(mpu.gyroyReal) < 50 && abs(motor_right.encoder) < 50)
+        if (fabs(mpu.pitch) < 10 && abs(mpu.gyroyReal) < 100 && abs(motor_right.encoder) < 100)
         {
-            if (balance.putdown_counter++ > 25)
+            if (balance.putdown_counter++ > 20)
             {
 				stop_flag = 0;  
 				balance.falldown_flag = 0;
 				balance.putdown_counter = 0;
 				balance.falldown_counter = 0;
 				balance.balance_enable = 1; 
-				PIDParamReset();       
+				CarParamReset();       
             }
         }
         else

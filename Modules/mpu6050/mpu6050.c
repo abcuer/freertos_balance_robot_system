@@ -229,7 +229,7 @@ void MPU_Get_Angle(MPU_t *mpu, float dt)
     mpu->gyroBalance = mpu->gyro[1];
     mpu->gyroyReal=mpu->gyro[1]/16.4;                            //陀螺仪量程转换	
     mpu->gyrozReal=mpu->gyro[2]/16.4;                            //陀螺仪量程转换
-    // float dt = MPU_GetTime();
+
     Kalman_getAngle(&KalmanY,mpu->accyAngle,-mpu->gyroyReal, dt); 
     mpu->pitch = KalmanY.angle;          //卡尔曼滤波算角度
 }

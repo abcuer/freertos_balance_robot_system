@@ -4,8 +4,8 @@
 
 #define BT_TIMEOUT 5000
 
-#define MAX_Speed 16
-#define MAX_Turn 20
+#define MAX_Speed 22
+#define MAX_Turn 24
 
 typedef struct
 {
@@ -23,6 +23,6 @@ typedef struct
 
 void BT_Init(void);
 void BT_Start(void);
-void Check_BT_Connect(void);
+void BT_Check_Connect(void);
 
 #endif

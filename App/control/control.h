@@ -20,7 +20,7 @@ float TurnPidCtrl(short gz);
 float DistPidCtrl(void);
 
 void PWMLimit(float PWMA, float PWMB);
-void PIDParamReset(void);
+void CarParamReset(void);
 
 extern PIDParam_t upright_pid;
 extern PIDParam_t speed_pid;

@@ -20,12 +20,8 @@ static void OLED_DrawBalancePage(float pitch)
     int time_w = u8g2_GetStrWidth(&u8g2, str);
     u8g2_DrawStr(&u8g2, 128 - time_w, 10, str); 
     u8g2_DrawHLine(&u8g2, 0, 12, 128); // 顶部分割线 (Y=12)
-
-    // --- UI 整体下移逻辑：设置新的基准中心线 ---
-    // 将中心从 38 下移到 40，这样圆顶部 (40-25=15) 距离分割线有 3 像素间隙
-    int base_y = 40; 
-
     // 2. 动态水平线
+    int base_y = 40; 
     int horizon_y = base_y + (int)(pitch * 1.2f); 
     for(int i=0; i<128; i+=8) u8g2_DrawPixel(&u8g2, i, base_y); // 虚线参考线随之移动
     u8g2_DrawHLine(&u8g2, 25, horizon_y, 78); 
@@ -37,13 +33,10 @@ static void OLED_DrawBalancePage(float pitch)
     u8g2_SetFont(&u8g2, u8g2_font_ncenB14_tr);
     sprintf(str, "%.1f", pitch);
     int pitch_w = u8g2_GetStrWidth(&u8g2, str);
-    // 原来是 43 (38+5)，现在改为 base_y + 5 = 45
     u8g2_DrawStr(&u8g2, 64 - (pitch_w / 2), base_y + 5, str);
-    
     // 5. "PIT" 标签（基于 base_y 偏移）
     u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
     int label_w = u8g2_GetStrWidth(&u8g2, "PIT");
-    // 原来是 58 (38+20)，现在改为 base_y + 20 = 60
     u8g2_DrawStr(&u8g2, 64 - (label_w / 2), base_y + 20, "PIT");
 }
 
@@ -113,6 +106,7 @@ static void OLED_DrawBluetoothPage(float distance, uint8_t is_connected)
     }
     u8g2_SetDrawColor(&u8g2, 1);
 }
+
 /**
  * @brief 绘制超声波跟随模式页面
  * @param distance 实际距离 d (cm)
@@ -123,7 +117,7 @@ static void OLED_DrawFollowPage(float distance, float target_dist)
     static uint8_t scan_angle = 0;
     char str[20];
     
-    // --- 1. 顶部状态栏 (统一风格) ---
+    // --- 1. 顶部状态栏 ---
     u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
     u8g2_DrawStr(&u8g2, 0, 10, "FOL-Mode"); // [左上]
     
@@ -138,7 +132,7 @@ static void OLED_DrawFollowPage(float distance, float target_dist)
     const int cx = 64; 
     const int cy = 50; // 圆心上移，确保扫描线不碰到下分割线
 
-    // 绘制雷达刻度半圆 (半径缩小，防止撞线)
+    // 绘制雷达刻度半圆
     u8g2_DrawCircle(&u8g2, cx, cy, 37, U8G2_DRAW_UPPER_RIGHT | U8G2_DRAW_UPPER_LEFT);
     u8g2_DrawCircle(&u8g2, cx, cy, 19, U8G2_DRAW_UPPER_RIGHT | U8G2_DRAW_UPPER_LEFT);
 
@@ -159,8 +153,7 @@ static void OLED_DrawFollowPage(float distance, float target_dist)
     u8g2_DrawFrame(&u8g2, cx - 5, ball_y - 5, 10, 10);  // 锁定框
 
     // --- 4. 底部数据反馈区 ---
-    u8g2_DrawHLine(&u8g2, 0, 53, 128); // *** 新增：底部分割线 ***
-
+    u8g2_DrawHLine(&u8g2, 0, 53, 128); 
     u8g2_SetFont(&u8g2, u8g2_font_4x6_tf); // 使用极小字体
     
     // 绘制 DIFF (左对齐)

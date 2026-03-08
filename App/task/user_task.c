@@ -21,7 +21,7 @@ void StartDetectTask(void const * argument)
     BT_Init();
     for(;;)
     {
-        Mode_Select();  	// 选择模式									
+        Mode_Select();  	// 模式切换									
         Detect_ObsDist();   // 获取超声波测距值
         Detect_FallDown();  // 提起/倒地检测							    
         Detect_PutDown();   // 着陆检测                           
