@@ -2,7 +2,7 @@
 ![](.doc/src/gif.gif)
 
  本项目是一款基于 **STM32** 与 **FreeRTOS实时操作系统**开发的多功能。通过**任务调度/信号量通信与逻辑设计**，实现了稳定的**平衡控制**、高精度的**环境感知**以及直观的 **u8g2 UI** 交互。
-## [视频演示](https://www.bilibili.com/video/BV1vuPRzzEkq) | [PCB开源](https://oshwhub.com/fascinating_sea/stm32_balancecar)
+## [视频演示](https://www.bilibili.com/video/BV1cacXzKEWj) | [PCB开源](https://oshwhub.com/fascinating_sea/stm32_balancecar)
 
 ## 🛠 核心架构：FreeRTOS 任务调度
 项目通过 FreeRTOS 实现了控制、监测与显示的完全解耦，量化任务配置如下：
@@ -70,6 +70,7 @@
 - [12V锂电池2500mAh(DC公母头) ￥22.6](https://e.tb.cn/h.6FaEa2BSxeb0pBQ?tk=a8VHVkztrz0)
 - [14p 18p 120p排母 ￥7](https://e.tb.cn/h.6FZKytSz8cwDzKC?tk=oqIVVkAIaMW)
 - [12p排针 ￥2.3]( https://e.tb.cn/h.6FZsiVNPa38YEo6?tk=emUCVkAHc1w )
+
 
 
 
