@@ -1,3 +1,4 @@
+#include "control.h"
 #include "headfile.h"
 #include "ui.h"
 #include "u8g2.h"
@@ -7,37 +8,48 @@
 /**
  * @brief 绘制平衡模式页面（姿态监控）
  */
-static void OLED_DrawBalancePage(float pitch) 
+static void OLED_DrawBalancePage(float pitch, float target_pitch) 
 {
     char str[20];
+    int base_center_y = 40; // 屏幕物理中心参考点
     
-    // 1. 顶部状态栏布局
+    // 1. 顶部状态栏布局 (保持不变)
     u8g2_SetFont(&u8g2, u8g2_font_6x10_tf); 
     u8g2_DrawStr(&u8g2, 0, 10, "BAL-MODE"); 
 
-    // --- 右上方：运行时间 ---
     sprintf(str, "%lus", HAL_GetTick() / 1000);
     int time_w = u8g2_GetStrWidth(&u8g2, str);
     u8g2_DrawStr(&u8g2, 128 - time_w, 10, str); 
-    u8g2_DrawHLine(&u8g2, 0, 12, 128); // 顶部分割线 (Y=12)
-    // 2. 动态水平线
-    int base_y = 40; 
-    int horizon_y = base_y + (int)(pitch * 1.2f); 
-    for(int i=0; i<128; i+=8) u8g2_DrawPixel(&u8g2, i, base_y); // 虚线参考线随之移动
-    u8g2_DrawHLine(&u8g2, 25, horizon_y, 78); 
+    u8g2_DrawHLine(&u8g2, 0, 12, 128); 
 
-    // 3. 固定圆圈装饰
-    u8g2_DrawCircle(&u8g2, 64, base_y, 25, U8G2_DRAW_ALL);
+    // 2. 计算位置
+    // 虚线位置：代表机械零点 (target_pitch)
+    int target_y = base_center_y + (int)(target_pitch * 1.2f); 
+    
+    // 实线位置：代表当前实际角度 (pitch)
+    int current_y = base_center_y + (int)(pitch * 1.2f); 
 
-    // 4. Pitch 角度数字展示（基于 base_y 偏移）
+    // 绘制虚线参考线 (会随 机械零点 移动)
+    for(int i=0; i<128; i+=8) {
+        u8g2_DrawPixel(&u8g2, i, target_y); 
+    }
+
+    // 绘制当前实线
+    u8g2_DrawHLine(&u8g2, 25, current_y, 78); 
+
+    // 3. 固定圆圈装饰 (如果你希望圆圈也跟着零点走，可以用 target_y 代替 base_center_y)
+    u8g2_DrawCircle(&u8g2, 64, target_y, 25, U8G2_DRAW_ALL);
+
+    // 4. 数字展示 (保持不变)
     u8g2_SetFont(&u8g2, u8g2_font_ncenB14_tr);
     sprintf(str, "%.1f", pitch);
     int pitch_w = u8g2_GetStrWidth(&u8g2, str);
-    u8g2_DrawStr(&u8g2, 64 - (pitch_w / 2), base_y + 5, str);
-    // 5. "PIT" 标签（基于 base_y 偏移）
+    u8g2_DrawStr(&u8g2, 64 - (pitch_w / 2), target_y + 5, str);
+
+    // 5. 标签
     u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
     int label_w = u8g2_GetStrWidth(&u8g2, "PIT");
-    u8g2_DrawStr(&u8g2, 64 - (label_w / 2), base_y + 20, "PIT");
+    u8g2_DrawStr(&u8g2, 64 - (label_w / 2), target_y + 20, "PIT");
 }
 
 /**
@@ -174,7 +186,7 @@ void UI_Show(void)
         // --- 正常模式显示 ---
         switch (balance.mode) 
         {
-            case 0: OLED_DrawBalancePage(mpu.pitch); break;
+            case 0: OLED_DrawBalancePage(mpu.pitch, upright_pid.tar); break;
             case 1: OLED_DrawBluetoothPage(distance, balance.is_connected); break;
             case 2: OLED_DrawFollowPage(distance, dist.target); break;
         }
